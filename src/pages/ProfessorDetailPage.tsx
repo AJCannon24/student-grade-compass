@@ -5,6 +5,7 @@ import Layout from '@/components/layout/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Edit } from 'lucide-react';
 import RatingStars from '@/components/common/RatingStars';
 import ReviewCard from '@/components/reviews/ReviewCard';
 import GradeDistributionChart from '@/components/grades/GradeDistributionChart';
@@ -19,6 +20,7 @@ const ProfessorDetailPage = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [gradeStats, setGradeStats] = useState<GradeStats[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [selectedTab, setSelectedTab] = useState('reviews');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +65,11 @@ const ProfessorDetailPage = () => {
         );
         
         setCourses(uniqueCourses);
+        
+        // Set default selected course if available
+        if (uniqueCourses.length > 0) {
+          setSelectedCourse(uniqueCourses[0]);
+        }
         
       } catch (err) {
         console.error("Error fetching professor data:", err);
@@ -145,9 +152,35 @@ const ProfessorDetailPage = () => {
                   <p className="font-bold text-xl">{courses.length}</p>
                 </div>
                 
-                <Button className="w-full">
-                  Rate Professor {professor.name.split(' ')[0]}
-                </Button>
+                {selectedCourse && (
+                  <Link to={`/review/professor/${professor.id}/course/${selectedCourse.id}`}>
+                    <Button className="w-full flex gap-2 items-center">
+                      <Edit size={16} />
+                      Rate Professor {professor.name.split(' ')[0]}
+                    </Button>
+                  </Link>
+                )}
+                
+                {!selectedCourse && courses.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm">Select a course to leave a review:</p>
+                    <select 
+                      className="w-full p-2 border rounded dark:bg-gray-800"
+                      value=""
+                      onChange={(e) => {
+                        const course = courses.find(c => c.id === e.target.value);
+                        setSelectedCourse(course || null);
+                      }}
+                    >
+                      <option value="" disabled>Select a course</option>
+                      {courses.map(course => (
+                        <option key={course.id} value={course.id}>
+                          {course.code} {course.number}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -163,10 +196,26 @@ const ProfessorDetailPage = () => {
                 {reviews.length === 0 ? (
                   <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <p className="text-lg mb-4">No reviews yet.</p>
-                    <Button>Be the first to leave a review</Button>
+                    {selectedCourse ? (
+                      <Link to={`/review/professor/${professor.id}/course/${selectedCourse.id}`}>
+                        <Button>Be the first to leave a review</Button>
+                      </Link>
+                    ) : (
+                      <p>Select a course to leave the first review</p>
+                    )}
                   </div>
                 ) : (
                   <>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-semibold">Student Reviews</h3>
+                      {selectedCourse && (
+                        <Link to={`/review/professor/${professor.id}/course/${selectedCourse.id}`}>
+                          <Button variant="outline" size="sm" className="flex gap-2 items-center">
+                            <Edit size={16} /> Add Your Review
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                     {reviews.map(review => (
                       <ReviewCard key={review.id} review={review} />
                     ))}

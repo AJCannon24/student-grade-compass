@@ -1,113 +1,188 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Sun, Moon } from 'lucide-react';
-import { useTheme } from '../../hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Search, Menu, X, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
-const Header = () => {
+const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { theme, setTheme } = useTheme();
+  const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
-
+  
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      setIsMenuOpen(false);
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
     }
   };
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
-
+  
   return (
-    <header className="bg-blue-600 text-white shadow-md">
-      <div className="container mx-auto px-4 py-3">
+    <header className="border-b bg-white dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold">Grade Compass</span>
-          </Link>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-6">
-            <form onSubmit={handleSearch} className="relative">
+          <div className="flex items-center">
+            {/* Logo */}
+            <Link to="/" className="font-bold text-2xl">
+              GradeCompass
+            </Link>
+          </div>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link to="/" className="text-sm font-medium hover:text-blue-600">Home</Link>
+            <Link to="/professors" className="text-sm font-medium hover:text-blue-600">Professors</Link>
+            <Link to="/courses" className="text-sm font-medium hover:text-blue-600">Courses</Link>
+            <Link to="/about" className="text-sm font-medium hover:text-blue-600">About</Link>
+            {isAdmin && (
+              <Link to="/admin" className="text-sm font-medium text-blue-600 hover:text-blue-800">Admin Panel</Link>
+            )}
+          </nav>
+          
+          {/* Desktop Search and Auth */}
+          <div className="hidden md:flex items-center space-x-4">
+            <form onSubmit={handleSearch} className="relative w-64">
               <Input
                 type="text"
-                placeholder="Search courses or professors..."
+                placeholder="Search..."
+                className="pr-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-4 py-2 rounded-full w-64 text-foreground"
               />
-              <button 
+              <Button 
                 type="submit" 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                aria-label="Search"
+                size="icon" 
+                variant="ghost" 
+                className="absolute right-0 top-0 h-10 w-10"
               >
-                <Search className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </form>
-            <nav className="flex space-x-4 items-center">
-              <Link to="/professors" className="hover:text-blue-100">Professors</Link>
-              <Link to="/courses" className="hover:text-blue-100">Courses</Link>
-              <Link to="/about" className="hover:text-blue-100">About</Link>
-              <Button variant="outline" onClick={toggleTheme} size="icon" className="bg-transparent border-white text-white hover:bg-blue-700">
-                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                <Search className="h-4 w-4" />
+                <span className="sr-only">Search</span>
               </Button>
+            </form>
+            
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm">{user.name}</span>
+                <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center gap-1">
+                  <LogOut size={16} />
+                  Logout
+                </Button>
+              </div>
+            ) : (
               <Link to="/login">
-                <Button className="bg-gold-500 hover:bg-gold-600 text-white">Sign In</Button>
+                <Button variant="outline" size="sm" className="flex items-center gap-1">
+                  <User size={16} />
+                  Login
+                </Button>
               </Link>
-            </nav>
+            )}
           </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-2">
-            <Button variant="ghost" onClick={toggleTheme} size="icon" className="text-white hover:bg-blue-700">
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden"
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+      </div>
+      
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden container mx-auto px-4 pb-4 space-y-4">
+          <form onSubmit={handleSearch} className="relative">
+            <Input
+              type="text"
+              placeholder="Search..."
+              className="pr-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button 
+              type="submit" 
+              size="icon" 
+              variant="ghost" 
+              className="absolute right-0 top-0 h-10 w-10"
+            >
+              <Search className="h-4 w-4" />
+              <span className="sr-only">Search</span>
             </Button>
-            <Button variant="ghost" onClick={toggleMenu} size="icon" className="text-white hover:bg-blue-700">
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
+          </form>
+          
+          <nav className="flex flex-col space-y-2">
+            <Link 
+              to="/" 
+              className="text-sm font-medium p-2 hover:bg-gray-100 rounded dark:hover:bg-gray-800"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/professors" 
+              className="text-sm font-medium p-2 hover:bg-gray-100 rounded dark:hover:bg-gray-800"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Professors
+            </Link>
+            <Link 
+              to="/courses" 
+              className="text-sm font-medium p-2 hover:bg-gray-100 rounded dark:hover:bg-gray-800"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Courses
+            </Link>
+            <Link 
+              to="/about" 
+              className="text-sm font-medium p-2 hover:bg-gray-100 rounded dark:hover:bg-gray-800"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              About
+            </Link>
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className="text-sm font-medium p-2 text-blue-600 hover:bg-blue-50 rounded dark:hover:bg-blue-900/20"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Admin Panel
+              </Link>
+            )}
+          </nav>
+          
+          <div className="pt-2 border-t">
+            {user ? (
+              <div className="flex items-center justify-between">
+                <span className="text-sm">{user.name}</span>
+                <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center gap-1">
+                  <LogOut size={16} />
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="outline" size="sm" className="w-full flex items-center justify-center gap-1">
+                  <User size={16} />
+                  Login
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden pt-4 pb-4 space-y-4">
-            <form onSubmit={handleSearch} className="relative mb-4">
-              <Input
-                type="text"
-                placeholder="Search courses or professors..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-4 py-2 rounded-full w-full text-foreground"
-              />
-              <button 
-                type="submit" 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                aria-label="Search"
-              >
-                <Search className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </form>
-            <nav className="flex flex-col space-y-2">
-              <Link to="/professors" className="hover:text-blue-100 py-2">Professors</Link>
-              <Link to="/courses" className="hover:text-blue-100 py-2">Courses</Link>
-              <Link to="/about" className="hover:text-blue-100 py-2">About</Link>
-              <Link to="/login" className="py-2">
-                <Button className="bg-gold-500 hover:bg-gold-600 text-white w-full">Sign In</Button>
-              </Link>
-            </nav>
-          </div>
-        )}
-      </div>
+      )}
     </header>
   );
 };

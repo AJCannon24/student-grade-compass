@@ -5,6 +5,7 @@ import Layout from '@/components/layout/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Edit } from 'lucide-react';
 import ProfessorCard from '@/components/professors/ProfessorCard';
 import ReviewCard from '@/components/reviews/ReviewCard';
 import GradeDistributionChart from '@/components/grades/GradeDistributionChart';
@@ -15,6 +16,7 @@ const CourseDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [course, setCourse] = useState<Course | null>(null);
   const [professors, setProfessors] = useState<Professor[]>([]);
+  const [selectedProfessor, setSelectedProfessor] = useState<Professor | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [gradeStats, setGradeStats] = useState<GradeStats[]>([]);
   const [selectedTab, setSelectedTab] = useState('professors');
@@ -40,6 +42,11 @@ const CourseDetailPage = () => {
         // Fetch professors who taught this course
         const professorsData = await getCourseProfessors(id);
         setProfessors(professorsData);
+        
+        // Set default selected professor if available
+        if (professorsData.length > 0) {
+          setSelectedProfessor(professorsData[0]);
+        }
         
         // Fetch course reviews
         const reviewsData = await getCourseReviews(id);
@@ -109,6 +116,18 @@ const CourseDetailPage = () => {
             </div>
           </div>
         </div>
+        
+        {/* Add course review button */}
+        {selectedProfessor && (
+          <div className="mb-6">
+            <Link to={`/review/professor/${selectedProfessor.id}/course/${course.id}`}>
+              <Button className="flex items-center gap-2">
+                <Edit size={16} />
+                Add Review for {course.code} {course.number}
+              </Button>
+            </Link>
+          </div>
+        )}
 
         <Tabs defaultValue="professors" onValueChange={setSelectedTab}>
           <TabsList className="w-full grid grid-cols-3 mb-6">
@@ -129,8 +148,37 @@ const CourseDetailPage = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {professors.map(professor => (
-                  <ProfessorCard key={professor.id} professor={professor} />
+                  <div key={professor.id}>
+                    <ProfessorCard professor={professor} />
+                    <div className="mt-2 text-center">
+                      <Link to={`/review/professor/${professor.id}/course/${course.id}`}>
+                        <Button size="sm" variant="outline">Rate This Professor</Button>
+                      </Link>
+                    </div>
+                  </div>
                 ))}
+              </div>
+            )}
+
+            {professors.length > 0 && (
+              <div className="mt-4">
+                <label htmlFor="professor-select" className="block text-sm font-medium mb-2">
+                  Select a professor to write a review:
+                </label>
+                <select
+                  id="professor-select"
+                  className="w-full sm:w-auto p-2 border rounded dark:bg-gray-800"
+                  value={selectedProfessor?.id || ''}
+                  onChange={(e) => {
+                    const professor = professors.find(p => p.id === e.target.value);
+                    setSelectedProfessor(professor || null);
+                  }}
+                >
+                  <option value="" disabled>Select a professor</option>
+                  {professors.map(professor => (
+                    <option key={professor.id} value={professor.id}>{professor.name}</option>
+                  ))}
+                </select>
               </div>
             )}
           </TabsContent>
@@ -139,13 +187,28 @@ const CourseDetailPage = () => {
             {reviews.length === 0 ? (
               <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <p className="text-lg mb-4">No reviews yet for this course.</p>
-                <Button>Write a Review</Button>
+                {selectedProfessor ? (
+                  <Link to={`/review/professor/${selectedProfessor.id}/course/${course.id}`}>
+                    <Button>Write a Review</Button>
+                  </Link>
+                ) : (
+                  <p>Select a professor to leave a review</p>
+                )}
               </div>
             ) : (
               <>
-                <h2 className="text-2xl font-semibold mb-4">
-                  Reviews for {course.code} {course.number}
-                </h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-semibold">
+                    Reviews for {course.code} {course.number}
+                  </h2>
+                  {selectedProfessor && (
+                    <Link to={`/review/professor/${selectedProfessor.id}/course/${course.id}`}>
+                      <Button variant="outline" size="sm" className="flex gap-2 items-center">
+                        <Edit size={16} /> Add Your Review
+                      </Button>
+                    </Link>
+                  )}
+                </div>
                 {reviews.map(review => (
                   <ReviewCard key={review.id} review={review} />
                 ))}
@@ -170,7 +233,16 @@ const CourseDetailPage = () => {
                     <Card key={stat.id} className="overflow-hidden">
                       <CardContent className="p-6">
                         <h3 className="text-xl font-semibold mb-4">
-                          {professor ? `Professor: ${professor.name}` : 'Unknown Professor'}
+                          {professor ? (
+                            <Link 
+                              to={`/professors/${professor.id}`} 
+                              className="hover:text-blue-600 hover:underline"
+                            >
+                              Professor: {professor.name}
+                            </Link>
+                          ) : (
+                            'Unknown Professor'
+                          )}
                         </h3>
                         <GradeDistributionChart gradeStats={stat} />
                       </CardContent>
