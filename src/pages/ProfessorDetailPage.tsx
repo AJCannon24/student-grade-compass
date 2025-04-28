@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RatingStars from '@/components/common/RatingStars';
 import ReviewCard from '@/components/reviews/ReviewCard';
 import GradeDistributionChart from '@/components/grades/GradeDistributionChart';
+import CourseCard from '@/components/courses/CourseCard';
 import { Professor, Review, Course, GradeStats } from '@/types';
 import { getProfessorById, getProfessorReviews, getProfessorGradeStats } from '@/services/professorService';
 import { getCourseById } from '@/services/courseService';
