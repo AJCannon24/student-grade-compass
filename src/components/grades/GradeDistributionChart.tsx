@@ -49,14 +49,7 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
   };
 
   // Monochromatic blue color palette
-  const blueColors = {
-    A: isDark ? "#93c5fe" : "#3b82f6", // blue-300/blue-500
-    B: isDark ? "#60a5fb" : "#2563eb", // blue-400/blue-600
-    C: isDark ? "#3b82f6" : "#1d4ed8", // blue-500/blue-700
-    D: isDark ? "#2563eb" : "#1e40af", // blue-600/blue-800
-    F: isDark ? "#1d4ed8" : "#1e3a8a", // blue-700/blue-900
-    W: isDark ? "#1e40af" : "#172554", // blue-800/blue-950
-  };
+  const blueColor = isDark ? "#3b82f6" : "#2563eb"; // blue-500/blue-600
 
   return (
     <div className="w-full">
@@ -81,16 +74,12 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
           <XAxis dataKey="name" />
           <YAxis allowDecimals={false} />
           <Tooltip content={<CustomTooltip />} />
-          {data.map((entry) => (
-            <Bar 
-              key={`bar-${entry.name}`}
-              dataKey="count"
-              fill={blueColors[entry.name as keyof typeof blueColors]}
-              name={entry.name}
-              radius={[4, 4, 0, 0]}
-              maxBarSize={60}
-            />
-          ))}
+          <Bar 
+            dataKey="count"
+            fill={blueColor}
+            radius={[4, 4, 0, 0]}
+            maxBarSize={60}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
