@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, TooltipProps } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
 import { GradeStats } from '@/types';
 import { calculateGPA } from '@/services/gradeService';
 
@@ -44,23 +44,7 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
     return null;
   };
 
-  const renderCustomizedLabel = (props: any) => {
-    const { x, y, width, height, value } = props;
-    const radius = 10;
-    
-    return (
-      <text 
-        x={x + width / 2} 
-        y={y - radius} 
-        fill="#000"
-        textAnchor="middle" 
-        dominantBaseline="middle"
-      >
-        {value}
-      </text>
-    );
-  };
-
+  // Enhanced color palette for better visibility
   const colors = {
     A: "#22c55e", // green-500
     B: "#3b82f6", // blue-500
@@ -93,20 +77,17 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
           <XAxis dataKey="name" />
           <YAxis allowDecimals={false} />
           <Tooltip content={<CustomTooltip />} />
-          <Bar 
-            dataKey="count" 
-            radius={[4, 4, 0, 0]}
-            maxBarSize={60}
-          >
-            {data.map((entry, index) => (
-              <Bar 
-                key={`bar-${index}`} 
-                dataKey="count" 
-                fill={colors[entry.name as keyof typeof colors]} 
-                className={entry.className}
-              />
-            ))}
-          </Bar>
+          {data.map((entry, index) => (
+            <Bar 
+              key={`bar-${entry.name}`}
+              dataKey="count"
+              fill={colors[entry.name as keyof typeof colors]}
+              name={entry.name}
+              className={entry.className}
+              radius={[4, 4, 0, 0]}
+              maxBarSize={60}
+            />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     </div>
