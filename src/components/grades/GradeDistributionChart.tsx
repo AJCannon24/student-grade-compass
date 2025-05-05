@@ -3,6 +3,7 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
 import { GradeStats } from '@/types';
 import { calculateGPA } from '@/services/gradeService';
+import { useTheme } from '@/hooks/use-theme';
 
 interface GradeDistributionChartProps {
   gradeStats: GradeStats;
@@ -13,6 +14,9 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
   gradeStats,
   height = 300 
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  
   const data = [
     { name: 'A', count: gradeStats.aCount, className: 'grade-a' },
     { name: 'B', count: gradeStats.bCount, className: 'grade-b' },
@@ -35,7 +39,7 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-3 border rounded shadow-lg">
+        <div className="bg-white dark:bg-gray-800 p-3 border rounded shadow-lg">
           <p className="font-medium">{`${data.name}: ${data.count} students`}</p>
           <p className="text-sm text-muted-foreground">{`${((data.count / totalStudents) * 100).toFixed(1)}% of class`}</p>
         </div>
@@ -44,14 +48,14 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
     return null;
   };
 
-  // Enhanced color palette for better visibility
-  const colors = {
-    A: "#22c55e", // green-500
-    B: "#3b82f6", // blue-500
-    C: "#eab308", // yellow-500
-    D: "#f97316", // orange-500
-    F: "#ef4444", // red-500
-    W: "#6b7280", // gray-500
+  // Monochromatic blue color palette
+  const blueColors = {
+    A: isDark ? "#93c5fe" : "#3b82f6", // blue-300/blue-500
+    B: isDark ? "#60a5fb" : "#2563eb", // blue-400/blue-600
+    C: isDark ? "#3b82f6" : "#1d4ed8", // blue-500/blue-700
+    D: isDark ? "#2563eb" : "#1e40af", // blue-600/blue-800
+    F: isDark ? "#1d4ed8" : "#1e3a8a", // blue-700/blue-900
+    W: isDark ? "#1e40af" : "#172554", // blue-800/blue-950
   };
 
   return (
@@ -77,13 +81,12 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
           <XAxis dataKey="name" />
           <YAxis allowDecimals={false} />
           <Tooltip content={<CustomTooltip />} />
-          {data.map((entry, index) => (
+          {data.map((entry) => (
             <Bar 
               key={`bar-${entry.name}`}
               dataKey="count"
-              fill={colors[entry.name as keyof typeof colors]}
+              fill={blueColors[entry.name as keyof typeof blueColors]}
               name={entry.name}
-              className={entry.className}
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
             />
