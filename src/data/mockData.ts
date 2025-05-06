@@ -171,7 +171,12 @@ export const mockGradeStats: GradeStats[] = [
     cCount: 4,
     dCount: 1,
     fCount: 0,
-    wCount: 2
+    wCount: 2,
+    pCount: 0,
+    npCount: 0,
+    ixCount: 0,
+    rdCount: 0,
+    ewCount: 0
   },
   {
     id: "g2",
@@ -183,7 +188,12 @@ export const mockGradeStats: GradeStats[] = [
     cCount: 7,
     dCount: 2,
     fCount: 1,
-    wCount: 3
+    wCount: 3,
+    pCount: 0,
+    npCount: 0,
+    ixCount: 0,
+    rdCount: 0,
+    ewCount: 0
   },
   {
     id: "g3",
@@ -195,7 +205,12 @@ export const mockGradeStats: GradeStats[] = [
     cCount: 5,
     dCount: 0,
     fCount: 0,
-    wCount: 1
+    wCount: 1,
+    pCount: 0,
+    npCount: 0,
+    ixCount: 0,
+    rdCount: 0,
+    ewCount: 0
   },
   {
     id: "g4",
@@ -207,7 +222,12 @@ export const mockGradeStats: GradeStats[] = [
     cCount: 3,
     dCount: 0,
     fCount: 0,
-    wCount: 0
+    wCount: 0,
+    pCount: 0,
+    npCount: 0,
+    ixCount: 0,
+    rdCount: 0,
+    ewCount: 0
   },
   {
     id: "g5",
@@ -219,6 +239,11 @@ export const mockGradeStats: GradeStats[] = [
     cCount: 8,
     dCount: 4,
     fCount: 2,
-    wCount: 5
+    wCount: 5,
+    pCount: 0,
+    npCount: 0,
+    ixCount: 0,
+    rdCount: 0,
+    ewCount: 0
   }
 ];

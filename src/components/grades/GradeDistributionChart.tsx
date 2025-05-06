@@ -114,11 +114,10 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
           <Tooltip content={<CustomTooltip />} />
           <Bar 
             dataKey="count"
-            fill={isDark ? "#3b82f6" : "#2563eb"}
             radius={[4, 4, 0, 0]}
             maxBarSize={60}
             name="Students"
-            fill={({ name }) => getGradeColor(name, isDark)}
+            fill={(data) => getGradeColor(data.name, isDark)}
           />
         </BarChart>
       </ResponsiveContainer>
