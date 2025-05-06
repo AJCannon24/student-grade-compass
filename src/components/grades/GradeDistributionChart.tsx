@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, TooltipProps, Cell } from 'recharts';
 import { GradeStats } from '@/types';
 import { calculateGPA, getTotalStudents } from '@/services/gradeService';
 import { useTheme } from '@/hooks/use-theme';
@@ -117,8 +117,11 @@ const GradeDistributionChart: React.FC<GradeDistributionChartProps> = ({
             radius={[4, 4, 0, 0]}
             maxBarSize={60}
             name="Students"
-            fill={(data) => getGradeColor(data.name, isDark)}
-          />
+          >
+            {allGradeData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={getGradeColor(entry.name, isDark)} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
       
