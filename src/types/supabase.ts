@@ -1,6 +1,6 @@
 
 export interface GradeDistroRecord {
-  id: bigint;
+  id: number;
   created_at: string;
   Department: string;
   Course: string;

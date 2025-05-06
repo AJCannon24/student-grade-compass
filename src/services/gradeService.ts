@@ -21,7 +21,8 @@ export const getGradeStats = async (): Promise<GradeStats[]> => {
       return mockGradeStats;
     }
 
-    return mapGradeDistroToGradeStats(data as GradeDistroRecord[]);
+    // Type assertion to fix incompatible types
+    return mapGradeDistroToGradeStats(data as unknown as GradeDistroRecord[]);
   } catch (err) {
     console.error('Exception fetching grade stats:', err);
     return mockGradeStats;

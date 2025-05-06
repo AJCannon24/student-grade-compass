@@ -21,7 +21,8 @@ export const getProfessors = async (): Promise<Professor[]> => {
       return mockProfessors;
     }
 
-    return mapGradeDistroToProfessor(data as GradeDistroRecord[]);
+    // Type assertion to fix incompatible types
+    return mapGradeDistroToProfessor(data as unknown as GradeDistroRecord[]);
   } catch (err) {
     console.error('Exception fetching professors:', err);
     return mockProfessors; // Fallback to mock data
@@ -62,7 +63,8 @@ export const getProfessorGradeStats = async (professorId: string) => {
       return mockGradeStats.filter(g => g.professorId === professorId);
     }
 
-    const allGradeStats = mapGradeDistroToGradeStats(data as GradeDistroRecord[]);
+    // Type assertion to fix incompatible types
+    const allGradeStats = mapGradeDistroToGradeStats(data as unknown as GradeDistroRecord[]);
     return allGradeStats.filter(g => g.professorId === professorId);
   } catch (err) {
     console.error('Exception fetching grade stats:', err);
