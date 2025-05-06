@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
@@ -6,15 +7,18 @@ import { Input } from '@/components/ui/input';
 import Layout from '@/components/layout/Layout';
 import ProfessorCard from '@/components/professors/ProfessorCard';
 import CourseCard from '@/components/courses/CourseCard';
+import GradeDistributionSection from '@/components/homepage/GradeDistributionSection';
 import { Professor, Course } from '@/types';
 import { getProfessors } from '@/services/professorService';
 import { getCourses } from '@/services/courseService';
+
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [professors, setProfessors] = useState<Professor[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,12 +40,14 @@ const HomePage = () => {
     };
     fetchData();
   }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+
   return <Layout>
       <section className="py-12 md:py-20 bg-sky-400">
         <div className="max-w-3xl mx-auto text-center">
@@ -70,6 +76,9 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      
+      {/* Add the new Grade Distribution Section here */}
+      <GradeDistributionSection />
       
       <section className="py-10">
         <div className="container">
@@ -127,4 +136,5 @@ const HomePage = () => {
       </section>
     </Layout>;
 };
+
 export default HomePage;
