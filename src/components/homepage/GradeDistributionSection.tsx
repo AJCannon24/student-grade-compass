@@ -8,6 +8,7 @@ import { getGradeStats } from '@/services/gradeService';
 import { getCourses } from '@/services/courseService';
 import { getProfessorById } from '@/services/professorService';
 import { GradeStats, Course, Professor } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
 const GradeDistributionSection: React.FC = () => {
   const [gradeStats, setGradeStats] = useState<GradeStats[]>([]);
@@ -20,21 +21,53 @@ const GradeDistributionSection: React.FC = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [gradeStatsData, coursesData] = await Promise.all([
-          getGradeStats(),
-          getCourses()
-        ]);
         
-        // Get the 3 most recent grade distributions
-        const recentStats = gradeStatsData
-          .sort((a, b) => a.term > b.term ? -1 : 1)
-          .slice(0, 3);
+        // Directly fetch from the GradeDistro table
+        const { data: gradeDistroData, error } = await supabase
+          .from('GradeDistro')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(3);
           
-        setGradeStats(recentStats);
+        if (error) {
+          console.error("Error fetching GradeDistro data:", error);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Map the data from GradeDistro into the GradeStats format
+        const mappedStats = gradeDistroData.map(record => {
+          // Create IDs based on instructor and course
+          const professorId = `p_${record.Instructor.replace(/\s+/g, '_').toLowerCase()}`;
+          const courseId = `c_${record.Department.toLowerCase()}_${record.Course}`;
+          
+          return {
+            id: `g_${record.id}`,
+            professorId,
+            courseId,
+            term: record.Section,
+            aCount: parseInt(record.A) || 0,
+            bCount: parseInt(record.B) || 0,
+            cCount: parseInt(record.C) || 0,
+            dCount: parseInt(record.D) || 0,
+            fCount: parseInt(record.F) || 0,
+            wCount: parseInt(record.W) || 0,
+            pCount: parseInt(record.P) || 0,
+            npCount: parseInt(record.NP) || 0,
+            ixCount: parseInt(record.IX) || 0,
+            rdCount: parseInt(record.RD) || 0,
+            ewCount: parseInt(record.EW) || 0
+          };
+        });
+        
+        setGradeStats(mappedStats);
+        
+        // Fetch courses and professors based on the grades data
+        const coursesData = await getCourses();
         setCourses(coursesData);
         
-        // Fetch professors for each grade stat
-        const professorIds = new Set(recentStats.map(stat => stat.professorId));
+        // Get unique professor IDs from the grades data
+        const professorIds = new Set(mappedStats.map(stat => stat.professorId));
         const professorsData: Record<string, Professor> = {};
         
         for (const id of professorIds) {
