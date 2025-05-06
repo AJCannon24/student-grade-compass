@@ -1,24 +1,62 @@
 
+import { supabase } from '../integrations/supabase/client';
 import { mockGradeStats } from '../data/mockData';
 import { GradeStats } from '../types';
+import { mapGradeDistroToGradeStats } from '../utils/dataMappers';
+import { GradeDistroRecord } from '../types/supabase';
 
-export const getGradeStats = (): Promise<GradeStats[]> => {
-  return Promise.resolve(mockGradeStats);
+export const getGradeStats = async (): Promise<GradeStats[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('GradeDistro')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching grade stats from Supabase:', error);
+      return mockGradeStats; // Fallback to mock data
+    }
+
+    if (!data || data.length === 0) {
+      console.warn('No grade stats found in Supabase, using mock data');
+      return mockGradeStats;
+    }
+
+    return mapGradeDistroToGradeStats(data as GradeDistroRecord[]);
+  } catch (err) {
+    console.error('Exception fetching grade stats:', err);
+    return mockGradeStats;
+  }
 };
 
-export const getGradeStatsById = (id: string): Promise<GradeStats | null> => {
-  const stats = mockGradeStats.find(g => g.id === id);
-  return Promise.resolve(stats || null);
+export const getGradeStatsById = async (id: string): Promise<GradeStats | null> => {
+  try {
+    const gradeStats = await getGradeStats();
+    const stats = gradeStats.find(g => g.id === id);
+    return stats || null;
+  } catch (err) {
+    console.error('Error fetching grade stats by ID:', err);
+    const stats = mockGradeStats.find(g => g.id === id);
+    return stats || null;
+  }
 };
 
-export const getGradeStatsByProfessorAndCourse = (
+export const getGradeStatsByProfessorAndCourse = async (
   professorId: string, 
   courseId: string
 ): Promise<GradeStats[]> => {
-  const stats = mockGradeStats.filter(
-    g => g.professorId === professorId && g.courseId === courseId
-  );
-  return Promise.resolve(stats);
+  try {
+    const gradeStats = await getGradeStats();
+    const stats = gradeStats.filter(
+      g => g.professorId === professorId && g.courseId === courseId
+    );
+    return stats;
+  } catch (err) {
+    console.error('Error fetching grade stats by professor and course:', err);
+    const stats = mockGradeStats.filter(
+      g => g.professorId === professorId && g.courseId === courseId
+    );
+    return stats;
+  }
 };
 
 export const calculateGPA = (stats: GradeStats): number => {

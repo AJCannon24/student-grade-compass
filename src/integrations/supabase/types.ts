@@ -30,6 +30,69 @@ export type Database = {
         }
         Relationships: []
       }
+      GradeDistro: {
+        Row: {
+          A: string
+          B: string
+          C: string
+          Course: string
+          created_at: string
+          D: string
+          Department: string
+          EW: string
+          F: string
+          id: number
+          Instructor: string
+          IX: string
+          NP: string
+          P: string
+          RD: string
+          Section: string
+          Total: string
+          W: string
+        }
+        Insert: {
+          A: string
+          B: string
+          C: string
+          Course: string
+          created_at?: string
+          D: string
+          Department: string
+          EW: string
+          F: string
+          id?: number
+          Instructor: string
+          IX: string
+          NP: string
+          P: string
+          RD: string
+          Section: string
+          Total: string
+          W: string
+        }
+        Update: {
+          A?: string
+          B?: string
+          C?: string
+          Course?: string
+          created_at?: string
+          D?: string
+          Department?: string
+          EW?: string
+          F?: string
+          id?: number
+          Instructor?: string
+          IX?: string
+          NP?: string
+          P?: string
+          RD?: string
+          Section?: string
+          Total?: string
+          W?: string
+        }
+        Relationships: []
+      }
       gradestats: {
         Row: {
           a: number | null

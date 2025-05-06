@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import DataDebugger from "@/components/debug/DataDebugger";
 
 import HomePage from "./pages/HomePage";
 import ProfessorsPage from "./pages/ProfessorsPage";
@@ -57,6 +57,7 @@ const App = () => (
               />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <DataDebugger />
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>
