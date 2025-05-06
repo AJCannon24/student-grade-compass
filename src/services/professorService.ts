@@ -7,6 +7,7 @@ import { GradeDistroRecord } from '../types/supabase';
 
 export const getProfessors = async (): Promise<Professor[]> => {
   try {
+    // Note: Table name is case-sensitive in Supabase queries
     const { data, error } = await supabase
       .from('GradeDistro')
       .select('*');
@@ -22,7 +23,7 @@ export const getProfessors = async (): Promise<Professor[]> => {
     }
 
     // Type assertion to fix incompatible types
-    return mapGradeDistroToProfessor(data as unknown as GradeDistroRecord[]);
+    return mapGradeDistroToProfessor(data as GradeDistroRecord[]);
   } catch (err) {
     console.error('Exception fetching professors:', err);
     return mockProfessors; // Fallback to mock data
@@ -64,7 +65,7 @@ export const getProfessorGradeStats = async (professorId: string) => {
     }
 
     // Type assertion to fix incompatible types
-    const allGradeStats = mapGradeDistroToGradeStats(data as unknown as GradeDistroRecord[]);
+    const allGradeStats = mapGradeDistroToGradeStats(data as GradeDistroRecord[]);
     return allGradeStats.filter(g => g.professorId === professorId);
   } catch (err) {
     console.error('Exception fetching grade stats:', err);

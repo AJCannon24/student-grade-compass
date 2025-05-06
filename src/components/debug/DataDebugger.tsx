@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { getProfessors } from '@/services/professorService';
 import { getGradeStats } from '@/services/gradeService';
+import { supabase } from '@/integrations/supabase/client';
 
 const DataDebugger = () => {
   const [professors, setProfessors] = useState<any[]>([]);
   const [gradeStats, setGradeStats] = useState<any[]>([]);
+  const [rawData, setRawData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDebug, setShowDebug] = useState(false);
@@ -14,6 +16,21 @@ const DataDebugger = () => {
     const loadData = async () => {
       try {
         setLoading(true);
+        
+        // Fetch raw data from GradeDistro
+        const { data: rawGradeDistro, error: rawError } = await supabase
+          .from('GradeDistro')
+          .select('*')
+          .limit(5);
+          
+        if (rawError) {
+          console.error('Error fetching raw data:', rawError);
+          setError('Failed to load raw data from Supabase');
+        } else {
+          setRawData(rawGradeDistro || []);
+        }
+        
+        // Fetch mapped professors and grade stats
         const professorsData = await getProfessors();
         const gradeStatsData = await getGradeStats();
         
@@ -61,6 +78,14 @@ const DataDebugger = () => {
         <p className="text-red-500">{error}</p>
       ) : (
         <div className="space-y-4">
+          <div>
+            <h4 className="font-medium mb-2">Raw GradeDistro ({rawData.length})</h4>
+            <div className="text-xs bg-gray-100 dark:bg-gray-900 p-2 rounded overflow-auto max-h-40">
+              <pre>{JSON.stringify(rawData.slice(0, 1), null, 2)}</pre>
+              {rawData.length > 1 && <p className="text-gray-500 mt-1">...and {rawData.length - 1} more</p>}
+            </div>
+          </div>
+          
           <div>
             <h4 className="font-medium mb-2">Professors ({professors.length})</h4>
             <div className="text-xs bg-gray-100 dark:bg-gray-900 p-2 rounded overflow-auto max-h-40">
