@@ -61,6 +61,8 @@ export const getGradeStatsByProfessorAndCourse = async (
 };
 
 export const calculateGPA = (stats: GradeStats): number => {
+  // GPA only counts letter grades (A, B, C, D, F)
+  // P, NP, IX, RD, EW, and W are not included in GPA calculation
   const totalStudents = stats.aCount + stats.bCount + stats.cCount + stats.dCount + stats.fCount;
   if (totalStudents === 0) return 0;
   
@@ -71,6 +73,21 @@ export const calculateGPA = (stats: GradeStats): number => {
     stats.dCount * 1;
   
   return parseFloat((totalPoints / totalStudents).toFixed(2));
+};
+
+export const getTotalStudents = (stats: GradeStats): number => {
+  // Count all students, including those with non-GPA grades
+  return stats.aCount + 
+         stats.bCount + 
+         stats.cCount + 
+         stats.dCount + 
+         stats.fCount + 
+         stats.wCount +
+         stats.pCount +
+         stats.npCount +
+         stats.ixCount +
+         stats.rdCount +
+         stats.ewCount;
 };
 
 export const importGradeStats = (csvData: string): Promise<GradeStats[]> => {

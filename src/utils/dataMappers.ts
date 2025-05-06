@@ -64,13 +64,18 @@ export const mapGradeDistroToGradeStats = (
     const professorId = `p_${record.Instructor.replace(/\s+/g, '_').toLowerCase()}`;
     const courseId = `c_${record.Department.toLowerCase()}_${record.Course}`;
     
-    // Parse grade counts as numbers
+    // Parse grade counts as numbers (handle all grade categories)
     const aCount = parseInt(record.A) || 0;
     const bCount = parseInt(record.B) || 0;
     const cCount = parseInt(record.C) || 0;
     const dCount = parseInt(record.D) || 0;
     const fCount = parseInt(record.F) || 0;
     const wCount = parseInt(record.W) || 0;
+    const pCount = parseInt(record.P) || 0;
+    const npCount = parseInt(record.NP) || 0;
+    const ixCount = parseInt(record.IX) || 0;
+    const rdCount = parseInt(record.RD) || 0;
+    const ewCount = parseInt(record.EW) || 0;
     
     // Use the section as term info with a standardized format
     let term = record.Section;
@@ -89,7 +94,12 @@ export const mapGradeDistroToGradeStats = (
       cCount,
       dCount,
       fCount,
-      wCount
+      wCount,
+      pCount,
+      npCount,
+      ixCount,
+      rdCount,
+      ewCount
     };
   });
 };

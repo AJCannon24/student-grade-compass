@@ -57,6 +57,11 @@ export interface GradeStats {
   dCount: number;
   fCount: number;
   wCount: number;
+  pCount: number;  // Pass
+  npCount: number; // No Pass
+  ixCount: number; // Incomplete
+  rdCount: number; // Report Delayed
+  ewCount: number; // Excused Withdrawal
 }
 
 export interface User {
